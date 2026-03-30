@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
 const fadeUp = {
@@ -62,9 +63,19 @@ const Partnerships = () => {
       return;
     }
     setSubmitting(true);
-    // TODO: Replace with Supabase insert once Cloud is enabled
-    await new Promise((r) => setTimeout(r, 1200));
+    const { error } = await supabase.from("partnership_leads").insert({
+      full_name: form.fullName,
+      designation: form.designation || null,
+      institution: form.institution,
+      student_body_size: form.studentBodySize,
+      email: form.email,
+      message: form.message || null,
+    });
     setSubmitting(false);
+    if (error) {
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+      return;
+    }
     setSubmitted(true);
   };
 
